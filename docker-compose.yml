@@ -1,0 +1,59 @@
+version: '3'
+
+services:
+  mysql:
+    image: mysql:latest
+    container_name: mysql-container
+    environment:
+      MYSQL_ROOT_PASSWORD: 12Qq1212
+      MYSQL_DATABASE: devops-db
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - my-network
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    depends_on:
+      - mysql
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+    networks:
+      - my-network
+
+  backend:
+    image: mammarraza/back:1.0
+    container_name: backend
+    ports:
+      - "9001:9001"
+    environment:
+      DB_HOST: mysql
+      DB_USER: root
+      DB_PASSWORD: 12Qq1212
+      DB_DATABASE: devops-db
+    networks:
+      - my-network
+  
+  frontend:
+    image: mammarraza/front:1.0
+    container_name: frontend
+    ports:
+      - "4173:4173"
+    environment:
+      VITE_BASE_URL: http://3.88.170.116:9001
+    networks:
+      - my-network
+
+volumes:
+  mysql-data:
+    driver: local
+
+networks:
+  my-network:
+    driver: bridge
